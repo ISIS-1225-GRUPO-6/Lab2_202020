@@ -113,12 +113,75 @@ def countElementsByCriteria(criteria, column, lst):
     """
     return 0
 
-def orderElementsByCriteria(function, column, lst, elements):
+def orderElementsByCriteria(orden, column, lstsalida, lstentrada):
     """
     Retorna una lista con cierta cantidad de elementos ordenados por el criterio
     """
-    return 0
+    t1_start = process_time()
 
+    if(orden==0):
+        for i in range(len(lstentrada)):
+            actual= lt.getElement(lstentrada,i)
+            if(len(lstsalida)==0):
+                lt.addFirst(lstsalida, actual)
+            else:
+                for j in range(len(lstsalida)):
+                    actual1= lstsalida[j]
+                    if(float(actual[column])>float(actual1[column])):
+                        lt.insertElement(lstsalida,actual,j)
+                        break
+
+
+
+    else: 
+        for i in range(len(lstentrada)):
+            actual= lt.getElement(lstentrada,i)
+            if(len(lstsalida)==0):
+                lt.addFirst(lstsalida, actual)
+            else:
+                for j in range(len(lstsalida)):
+                    actual1= lstsalida[j]
+                    if(float(actual[column])<float(actual1[column])):
+                        lt.insertElement(lstsalida,actual,j)
+                        break
+    t1_stop = process_time() #tiempo final
+    print("Tiempo de ejecución ",t1_stop-t1_start," segundos")                    
+
+def menu1():
+    print("\nBienvenido, te mostraremos las 10 peliculas: ")
+    print("1- mas votadas")
+    print("2- menos botadas")
+    print("3- mejor calificadas")
+    print("4- peor calificadas")
+    
+def selcol(resp, orden):
+    resp1=''
+    if resp ==1:
+        resp1 = 'vote_count'
+        orden=0
+    elif resp ==2:
+        resp1 = 'vote_count'
+        orden=1
+    elif resp ==3:
+        resp1 = 'vote_average'
+        orden=0
+    elif resp ==4:
+        resp1 = 'vote_average'
+        orden=1
+    else:
+        print("no seleccionaste ninguna opcion valida")
+    
+    return resp1
+
+def pel10(lista):
+    resp=""
+    if lista==None or lista['size']==0: #obtener la longitud de la lista
+         print("La lista esta vacía")    
+    else: 
+        for i in range (10):
+            resp += lista[i]['original_title'] + "\n"
+    return resp
+    
 def main():
     """
     Método principal del programa, se encarga de manejar todos los metodos adicionales creados
@@ -133,7 +196,7 @@ def main():
         inputs =input('Seleccione una opción para continuar\n') #leer opción ingresada
         if len(inputs)>0:
             if int(inputs[0])==1: #opcion 1
-                lista = loadCSVFile("Data/test.csv") #llamar funcion cargar datos
+                lista = loadCSVFile("Data/themoviesdb/AllMoviesDetailsCleaned.csv") #llamar funcion cargar datos
                 print("Datos cargados, ",lista['size']," elementos cargados")
             elif int(inputs[0])==2: #opcion 2
                 if lista==None or lista['size']==0: #obtener la longitud de la lista
@@ -153,6 +216,19 @@ def main():
                     criteria =input('Ingrese el criterio de búsqueda\n')
                     counter=countElementsByCriteria(criteria,0,lista)
                     print("Coinciden ",counter," elementos con el crtierio: '", criteria ,"' (en construcción ...)")
+            elif int(inputs[0])==5: #opcion 5
+                if lista==None or lista['size']==0: #obtener la longitud de la lista
+                    print("La lista esta vacía")
+                else:
+                    menu1()
+                    resp = input("seleccione que opcion buscar \n")
+                    orden=0
+                    columna = selcol(int(resp), orden)
+                    lst1=lt.newList()
+                    orderElementsByCriteria(orden ,columna,lst1, lista)  #filtrar una columna por criterio  
+                    resp1= pel10(lst1)
+                    print( "las peliculas son: \n" + resp1)
+                
             elif int(inputs[0])==0: #opcion 0, salir
                 sys.exit(0)
                 
