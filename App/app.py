@@ -32,6 +32,8 @@ import csv
 from ADT import list as lt
 from DataStructures import listiterator as it
 from DataStructures import liststructure as lt
+from Sorting import shellsort as sh
+
 
 from time import process_time 
 
@@ -76,6 +78,7 @@ def printMenu():
     print("2- Contar los elementos de la Lista")
     print("3- Contar elementos filtrados por palabra clave")
     print("4- Consultar elementos a partir de dos listas")
+    print("5- Consultar peliculas")
     print("0- Salir")
 
 def countElementsFilteredByColumn(criteria, column, lst):
@@ -113,37 +116,85 @@ def countElementsByCriteria(criteria, column, lst):
     """
     return 0
 
+
+
+
+def mayor(pelicula1, pelicula2, column):
+    if(float(pelicula1[column])>float(pelicula2[column])):
+        return True
+    return False
+
+def menor(pelicula1, pelicula2, column):
+    if(float(pelicula1[column])>float(pelicula2[column])):
+        return True
+    return False
+
+def order(list, maome, column):
+    if(maome==0):
+        sh.shellSort(list , mayor, column)
+        for i in range(10):
+            pelicula = lt.getElement(list, i)
+            print (pelicula['title']+": "+ pelicula[column])
+    else:
+        sh.shellSort(list , menor, column)
+        for i in range(10):
+            pelicula = lt.getElement(list, i)
+            print (pelicula['title']+": "+ pelicula[column])
+
+
+
 def orderElementsByCriteria(orden, column, lstsalida, lstentrada):
     """
     Retorna una lista con cierta cantidad de elementos ordenados por el criterio
     """
     t1_start = process_time()
-
+    print("ejecutando proceso")
+    cont=0
     if(orden==0):
-        for i in range(len(lstentrada)):
+        for i in range(lstentrada['size']):
             actual= lt.getElement(lstentrada,i)
-            if(len(lstsalida)==0):
-                lt.addFirst(lstsalida, actual)
+            cont += 1
+            if(cont<2000):
+                if(lstsalida['size']==0):
+                    lt.addFirst(lstsalida, actual)
+                else:
+                    for j in range(lstsalida['size']):
+                        actual1= lt.getElement(lstsalida,j)
+                        actual2=lt.getElement(lstsalida,j+1)
+                        if(float(actual[column])>float(actual1[column])):
+                            lt.insertElement(lstsalida,actual,j)
+                            break
+                        elif(float(actual[column])<float(actual1[column]) or float(actual[column])>float(actual2[column])):
+                            lt.insertElement(lstsalida,actual,j+1)
+                            break
+                        elif(float(actual[column])<float(actual1[column]) and actual2==None):
+                            lt.addLast(lstsalida, actual)
+                            break
             else:
-                for j in range(len(lstsalida)):
-                    actual1= lstsalida[j]
-                    if(float(actual[column])>float(actual1[column])):
-                        lt.insertElement(lstsalida,actual,j)
-                        break
-
+                print(lstsalida['size'])
+                break
 
 
     else: 
-        for i in range(len(lstentrada)):
-            actual= lt.getElement(lstentrada,i)
-            if(len(lstsalida)==0):
+        for i in range(lstentrada['size']):
+            actual = lt.getElement(lstentrada,i)
+            if(lstsalida==None):
                 lt.addFirst(lstsalida, actual)
             else:
-                for j in range(len(lstsalida)):
-                    actual1= lstsalida[j]
+                for j in range(lstsalida['size']):
+                    actual1= lt.getElement(lstsalida,j)
+                    actual2=lt.getElement(lstsalida,j+1)
+
                     if(float(actual[column])<float(actual1[column])):
                         lt.insertElement(lstsalida,actual,j)
                         break
+                    elif(float(actual[column])>float(actual1[column]) or float(actual[column])<float(actual2[column])):
+                            lt.insertElement(lstsalida,actual,j+1)
+                            break
+                    elif(actual2==None):
+                        lt.addLast(lstsalida, actual)
+                        break
+
     t1_stop = process_time() #tiempo final
     print("Tiempo de ejecución ",t1_stop-t1_start," segundos")                    
 
@@ -179,7 +230,8 @@ def pel10(lista):
          print("La lista esta vacía")    
     else: 
         for i in range (10):
-            resp += lista[i]['original_title'] + "\n"
+            elemento = lt.getElement(lista,i)
+            resp += elemento['original_title'] + "\n"
     return resp
     
 def main():
@@ -191,12 +243,13 @@ def main():
     Return: None 
     """
     lista = lt.newList()   # se require usar lista definida
+    
     while True:
         printMenu() #imprimir el menu de opciones en consola
         inputs =input('Seleccione una opción para continuar\n') #leer opción ingresada
         if len(inputs)>0:
             if int(inputs[0])==1: #opcion 1
-                lista = loadCSVFile("Data/themoviesdb/AllMoviesDetailsCleaned.csv") #llamar funcion cargar datos
+                lista = loadCSVFile("Data/themoviesdb/SmallMoviesDetailsCleaned.csv") #llamar funcion cargar datos
                 print("Datos cargados, ",lista['size']," elementos cargados")
             elif int(inputs[0])==2: #opcion 2
                 if lista==None or lista['size']==0: #obtener la longitud de la lista
@@ -206,14 +259,14 @@ def main():
                 if lista==None or lista['size']==0: #obtener la longitud de la lista
                     print("La lista esta vacía")
                 else:   
-                    criteria =input('Ingrese el criterio de búsqueda\n')
+                    criteria = input('Ingrese el criterio de búsqueda\n')
                     counter=countElementsFilteredByColumn(criteria, "nombre", lista) #filtrar una columna por criterio  
                     print("Coinciden ",counter," elementos con el crtierio: ", criteria  )
             elif int(inputs[0])==4: #opcion 4
                 if lista==None or lista['size']==0: #obtener la longitud de la lista
                     print("La lista esta vacía")
                 else:
-                    criteria =input('Ingrese el criterio de búsqueda\n')
+                    criteria = input('Ingrese el criterio de búsqueda\n')
                     counter=countElementsByCriteria(criteria,0,lista)
                     print("Coinciden ",counter," elementos con el crtierio: '", criteria ,"' (en construcción ...)")
             elif int(inputs[0])==5: #opcion 5
@@ -223,11 +276,13 @@ def main():
                     menu1()
                     resp = input("seleccione que opcion buscar \n")
                     orden=0
+                    lst1 = lt.newList()
                     columna = selcol(int(resp), orden)
-                    lst1=lt.newList()
-                    orderElementsByCriteria(orden ,columna,lst1, lista)  #filtrar una columna por criterio  
+                    order(lista,orden,columna)
+                    orderElementsByCriteria(orden ,columna, lst1, lista)  #filtrar una columna por criterio  
                     resp1= pel10(lst1)
                     print( "las peliculas son: \n" + resp1)
+                   
                 
             elif int(inputs[0])==0: #opcion 0, salir
                 sys.exit(0)
