@@ -68,7 +68,6 @@ def loadCSVFile (file, sep=";"):
     print("Tiempo de ejecución ",t1_stop-t1_start," segundos")
     return lst
 
-
 def printMenu():
     """
     Imprime el menu de opciones
@@ -77,8 +76,9 @@ def printMenu():
     print("1- Cargar Datos")
     print("2- Contar los elementos de la Lista")
     print("3- Contar elementos filtrados por palabra clave")
-    print("4- Consultar elementos a partir de dos listas")
+    print("4- Consultar peliculas buenas de un director")
     print("5- Consultar peliculas")
+    print("6- Conocer a un director")
     print("0- Salir")
 
 def countElementsFilteredByColumn(criteria, column, lst):
@@ -110,14 +110,32 @@ def countElementsFilteredByColumn(criteria, column, lst):
         print("Tiempo de ejecución ",t1_stop-t1_start," segundos")
     return counter
 
-def countElementsByCriteria(criteria, column, lst):
-    """
-    Retorna la cantidad de elementos que cumplen con un criterio para una columna dada
-    """
-    return 0
-
-
-
+def countElementsByCriteria(criteria, column, lst, lst1):
+    if lst['size']==0 or lst1['size']==0:
+        print("lista vacia")
+        return 0
+    else:
+        t1_start=process_time()
+        cont=0
+        suma=0.0
+        prom = 0.0
+        for i in range(lst1['size']):
+            elemento= lt.getElement(lst1,i)
+            if elemento[column]==criteria:
+                id=int(elemento['id'])
+                for j in range(lst['size']):
+                    elemento1 = lt.getElement(lst,j)
+                    if int(elemento1['\ufeffid'])==id and float(elemento1['vote_average']) >= 6.0:
+                        cont+=1
+                        suma += float(elemento1['vote_average'])
+                        break
+        t1_stop = process_time() #tiempo final
+        print("Tiempo de ejecución ",t1_stop-t1_start," segundos")
+        if(cont==0):
+            return "0"
+        else: 
+            prom=(suma/cont)
+    return("El director tiene "+str(cont)+" peliculas buenas y su calificación media es "+str(prom))
 
 def mayor(pelicula1, pelicula2, column):
     if(float(pelicula1[column])>float(pelicula2[column])):
@@ -141,8 +159,34 @@ def order(list, maome, column):
             pelicula = lt.getElement(list, i)
             print (pelicula['title']+": "+ pelicula[column])
 
-
-
+def conocerAUnDir(lst, lst1, criteria):
+    if lst['size']==0 or lst1['size']==0:
+        print("lista vacia")
+        return 0
+    else:
+        t1_start=process_time()
+        cont=0
+        suma=0.0
+        prom = 0.0
+        for i in range(lst1['size']):
+            elemento= lt.getElement(lst1,i)
+            if elemento['director_name']==criteria:
+                id=int(elemento['id'])
+                for j in range(lst['size']):
+                    elemento1 = lt.getElement(lst,j)
+                    if int(elemento1['id'])==id:
+                        cont+=1
+                        suma += float(elemento1['vote_average'])
+                        print(str(cont)+": "+elemento1['original_title'])
+                        break
+        t1_stop = process_time() #tiempo final
+        print("\nTiempo de ejecución ",t1_stop-t1_start," segundos")
+        if(cont==0):
+            prom = 0
+        else: 
+            prom=(suma/cont)
+    print("\nEl director tiene "+str(cont)+" peliculas buenas y su calificación media es "+str(prom))
+    
 def orderElementsByCriteria(orden, column, lstsalida, lstentrada):
     """
     Retorna una lista con cierta cantidad de elementos ordenados por el criterio
@@ -199,13 +243,38 @@ def orderElementsByCriteria(orden, column, lstsalida, lstentrada):
     print("Tiempo de ejecución ",t1_stop-t1_start," segundos")                    
 
 def menu1():
+    print("\nBienvenido")
+    print("1- id")
+    print("2- genero")
+    print("3- id imdb")
+    print("4- titulo original")
+    print("5- popularidad")
+    
+def menu2():
     print("\nBienvenido, te mostraremos las 10 peliculas: ")
     print("1- mas votadas")
     print("2- menos botadas")
     print("3- mejor calificadas")
     print("4- peor calificadas")
     
-def selcol(resp, orden):
+def selcol(resp):
+    resp1=''
+    if resp ==1:
+        resp1 = '\ufeffid'
+    elif resp ==2:
+        resp1 = 'genres'
+    elif resp ==3:
+        resp1 = 'imdb_id'
+    elif resp ==4:
+        resp1 = 'original_title'
+    elif resp ==5:
+        resp1 = 'vote_average'
+    else:
+        print("no seleccionaste ninguna opcion valida")
+    
+    return resp1
+
+def selcol1(resp, orden):
     resp1=''
     if resp ==1:
         resp1 = 'vote_count'
@@ -223,16 +292,7 @@ def selcol(resp, orden):
         print("no seleccionaste ninguna opcion valida")
     
     return resp1
-
-def pel10(lista):
-    resp=""
-    if lista==None or lista['size']==0: #obtener la longitud de la lista
-         print("La lista esta vacía")    
-    else: 
-        for i in range (10):
-            elemento = lt.getElement(lista,i)
-            resp += elemento['original_title'] + "\n"
-    return resp
+    
     
 def main():
     """
@@ -243,45 +303,65 @@ def main():
     Return: None 
     """
     lista = lt.newList()   # se require usar lista definida
-    
+    lista1 = lt.newList() 
     while True:
         printMenu() #imprimir el menu de opciones en consola
         inputs =input('Seleccione una opción para continuar\n') #leer opción ingresada
         if len(inputs)>0:
             if int(inputs[0])==1: #opcion 1
-                lista = loadCSVFile("Data/themoviesdb/SmallMoviesDetailsCleaned.csv") #llamar funcion cargar datos
+                lista = loadCSVFile("Data/themoviesdb/SmallMoviesDetailsCleaned.csv")
+                lista1 = loadCSVFile("Data/themoviesdb/MoviesCastingRaw-small.csv") #llamar funcion cargar datos
                 print("Datos cargados, ",lista['size']," elementos cargados")
+            
+            
+            
             elif int(inputs[0])==2: #opcion 2
                 if lista==None or lista['size']==0: #obtener la longitud de la lista
                     print("La lista esta vacía")    
                 else: print("La lista tiene ",lista['size']," elementos")
+            
+            
             elif int(inputs[0])==3: #opcion 3
                 if lista==None or lista['size']==0: #obtener la longitud de la lista
                     print("La lista esta vacía")
                 else:   
-                    criteria = input('Ingrese el criterio de búsqueda\n')
-                    counter=countElementsFilteredByColumn(criteria, "nombre", lista) #filtrar una columna por criterio  
-                    print("Coinciden ",counter," elementos con el crtierio: ", criteria  )
+                    menu1()
+                    resp = input("seleccione que columna buscar \n")
+                    columna = selcol(int(resp))
+                    criteria =str(input('Ingrese el criterio de búsqueda\n'))
+                    counter=countElementsFilteredByColumn(criteria, columna, lista) #filtrar una columna por criterio  
+                    print("Coinciden ",counter," elementos con el crtierio: ", criteria   )
+
+             
+                   
             elif int(inputs[0])==4: #opcion 4
                 if lista==None or lista['size']==0: #obtener la longitud de la lista
                     print("La lista esta vacía")
                 else:
-                    criteria = input('Ingrese el criterio de búsqueda\n')
-                    counter=countElementsByCriteria(criteria,0,lista)
-                    print("Coinciden ",counter," elementos con el crtierio: '", criteria ,"' (en construcción ...)")
+                    print("en esta opcion te mostraremos la cantidad de peliculas \n  bien calificadas de un autor")
+                    criteria =input('Ingrese el criterio de búsqueda , el nombre del autor\n')
+                    counter=countElementsByCriteria(criteria,'director_name',lista,lista1)
+                    print(counter," , mostrando resultados, para el director: '", criteria ,"' (\n estas, que tienen una calificacion mayor a 6.0)")
+
+
+
             elif int(inputs[0])==5: #opcion 5
                 if lista==None or lista['size']==0: #obtener la longitud de la lista
                     print("La lista esta vacía")
                 else:
-                    menu1()
+                    menu2()
                     resp = input("seleccione que opcion buscar \n")
                     orden=0
-                    lst1 = lt.newList()
-                    columna = selcol(int(resp), orden)
+                    columna = selcol1(int(resp), orden)
                     order(lista,orden,columna)
-                    orderElementsByCriteria(orden ,columna, lst1, lista)  #filtrar una columna por criterio  
-                    resp1= pel10(lst1)
-                    print( "las peliculas son: \n" + resp1)
+
+            elif int(inputs[0])==6: #opcion 6
+                if lista==None or lista['size']==0: #obtener la longitud de la lista
+                    print("La lista esta vacía")
+                else:
+                    print("en esta opcion te mostraremos las peliculas de un autor")
+                    criteria =input('Ingrese el criterio de búsqueda , el nombre del autor\n')
+                    conocerAUnDir(lista,lista1, criteria)
                    
                 
             elif int(inputs[0])==0: #opcion 0, salir
