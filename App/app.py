@@ -79,6 +79,8 @@ def printMenu():
     print("4- Consultar peliculas buenas de un director")
     print("5- Consultar peliculas")
     print("6- Conocer a un director")
+    print("7- Conocer a un actor")
+    print("8- Conocer genero")
     print("0- Salir")
 
 def countElementsFilteredByColumn(criteria, column, lst):
@@ -125,12 +127,12 @@ def countElementsByCriteria(criteria, column, lst, lst1):
                 id=int(elemento['id'])
                 for j in range(lst['size']):
                     elemento1 = lt.getElement(lst,j)
-                    if int(elemento1['\ufeffid'])==id and float(elemento1['vote_average']) >= 6.0:
+                    if int(elemento1['id'])==id and float(elemento1['vote_average']) >= 6.0:
                         cont+=1
                         suma += float(elemento1['vote_average'])
                         break
         t1_stop = process_time() #tiempo final
-        print("Tiempo de ejecución ",t1_stop-t1_start," segundos")
+        print("\nTiempo de ejecución ",t1_stop-t1_start," segundos\n")
         if(cont==0):
             return "0"
         else: 
@@ -162,7 +164,6 @@ def order(list, maome, column):
 def conocerAUnDir(lst, lst1, criteria):
     if lst['size']==0 or lst1['size']==0:
         print("lista vacia")
-        return 0
     else:
         t1_start=process_time()
         cont=0
@@ -183,65 +184,95 @@ def conocerAUnDir(lst, lst1, criteria):
         print("\nTiempo de ejecución ",t1_stop-t1_start," segundos")
         if(cont==0):
             prom = 0
+            print("el director no existe en el catalogo")
         else: 
             prom=(suma/cont)
-    print("\nEl director tiene "+str(cont)+" peliculas buenas y su calificación media es "+str(prom))
-    
-def orderElementsByCriteria(orden, column, lstsalida, lstentrada):
-    """
-    Retorna una lista con cierta cantidad de elementos ordenados por el criterio
-    """
-    t1_start = process_time()
-    print("ejecutando proceso")
-    cont=0
-    if(orden==0):
-        for i in range(lstentrada['size']):
-            actual= lt.getElement(lstentrada,i)
-            cont += 1
-            if(cont<2000):
-                if(lstsalida['size']==0):
-                    lt.addFirst(lstsalida, actual)
+            print("\nEl director tiene "+str(cont)+" peliculas buenas y su calificación media es "+str(prom))
+
+def existe(lst, column, criteria ):
+    for i in  range(lst['size']):
+        element = lt.getElement(lst, i)
+        if(element[column] == criteria):
+            return True
+            break
+        else:
+            return False
+
+def conocerAUnActor(lst, lst1, criteria):
+    if lst['size']==0 or lst1['size']==0:
+        print("lista vacia")
+    else:
+        director = lt.newList()
+        t1_start=process_time()
+        cont=0
+        suma=0.0
+        prom = 0.0
+        directorname=""
+        for i in range(lst1['size']):
+            elemento= lt.getElement(lst1,i)
+            if elemento['actor1_name']==criteria or elemento['actor2_name']==criteria or elemento['actor3_name']==criteria or elemento['actor4_name']==criteria or elemento['actor5_name']==criteria:
+                namedic = elemento['director_name']
+                if director['size']==0 or director== None:
+                    lt.addFirst(director,{'name':namedic, 'veces':1})
                 else:
-                    for j in range(lstsalida['size']):
-                        actual1= lt.getElement(lstsalida,j)
-                        actual2=lt.getElement(lstsalida,j+1)
-                        if(float(actual[column])>float(actual1[column])):
-                            lt.insertElement(lstsalida,actual,j)
-                            break
-                        elif(float(actual[column])<float(actual1[column]) or float(actual[column])>float(actual2[column])):
-                            lt.insertElement(lstsalida,actual,j+1)
-                            break
-                        elif(float(actual[column])<float(actual1[column]) and actual2==None):
-                            lt.addLast(lstsalida, actual)
-                            break
-            else:
-                print(lstsalida['size'])
-                break
+                    if existe(director,'name', namedic):
+                        for dir in director:
+                            if dir['name']==namedic:
+                                dir['veces']+=1
+                                break
+                    else:
+                        lt.addLast(director,{'name':namedic, 'veces':1})
 
 
-    else: 
-        for i in range(lstentrada['size']):
-            actual = lt.getElement(lstentrada,i)
-            if(lstsalida==None):
-                lt.addFirst(lstsalida, actual)
-            else:
-                for j in range(lstsalida['size']):
-                    actual1= lt.getElement(lstsalida,j)
-                    actual2=lt.getElement(lstsalida,j+1)
-
-                    if(float(actual[column])<float(actual1[column])):
-                        lt.insertElement(lstsalida,actual,j)
-                        break
-                    elif(float(actual[column])>float(actual1[column]) or float(actual[column])<float(actual2[column])):
-                            lt.insertElement(lstsalida,actual,j+1)
-                            break
-                    elif(actual2==None):
-                        lt.addLast(lstsalida, actual)
+                id=int(elemento['id'])
+                for j in range(lst['size']):
+                    elemento1 = lt.getElement(lst,j)
+                    if int(elemento1['id'])==id:
+                        cont+=1
+                        suma += float(elemento1['vote_average'])
+                        print(str(cont)+": "+elemento1['original_title'])
                         break
 
-    t1_stop = process_time() #tiempo final
-    print("Tiempo de ejecución ",t1_stop-t1_start," segundos")                    
+        mas=0           
+        for i in range(director['size']):
+            element = lt.getElement(director, i)
+            if int(element['veces'])> mas:
+                directorname= element['name']
 
+        t1_stop = process_time() #tiempo final
+        print("\nTiempo de ejecución ",t1_stop-t1_start," segundos")
+        if(cont==0):
+            prom = 0
+        else: 
+            prom=(suma/cont)
+    print("\nEl actor tiene "+str(cont)+" peliculas y su calificación media es "+str(prom)+ "\n el director con quien mas ha grabado es: "+ directorname)
+
+def conocerGenero(lst, criteria):
+    if lst['size']==0 :
+        print("lista vacia")
+    else:
+        t1_start=process_time()
+        cont=0
+        suma=0.0
+        prom = 0.0
+        for i in range(lst['size']):
+            elemento= lt.getElement(lst,i)
+            generos = elemento['genres'].split("|")
+            for genero in generos:
+                if genero.strip() == criteria:
+                    cont+=1
+                    suma += float(elemento['vote_average'])
+                    print(str(cont)+": "+elemento['original_title'])
+                    break
+                
+        t1_stop = process_time() #tiempo final
+        print("\nTiempo de ejecución ",t1_stop-t1_start," segundos")
+        if(cont==0):
+            prom = 0
+        else: 
+            prom=(suma/cont)
+    print("\nEl genero tiene "+str(cont)+" peliculas y su calificación media es "+str(prom))
+                      
 def menu1():
     print("\nBienvenido")
     print("1- id")
@@ -292,8 +323,7 @@ def selcol1(resp, orden):
         print("no seleccionaste ninguna opcion valida")
     
     return resp1
-    
-    
+      
 def main():
     """
     Método principal del programa, se encarga de manejar todos los metodos adicionales creados
@@ -312,6 +342,7 @@ def main():
                 lista = loadCSVFile("Data/themoviesdb/SmallMoviesDetailsCleaned.csv")
                 lista1 = loadCSVFile("Data/themoviesdb/MoviesCastingRaw-small.csv") #llamar funcion cargar datos
                 print("Datos cargados, ",lista['size']," elementos cargados")
+                print(lt.getElement(lista, 0))
             
             
             
@@ -359,9 +390,25 @@ def main():
                 if lista==None or lista['size']==0: #obtener la longitud de la lista
                     print("La lista esta vacía")
                 else:
-                    print("en esta opcion te mostraremos las peliculas de un autor")
-                    criteria =input('Ingrese el criterio de búsqueda , el nombre del autor\n')
+                    print("en esta opcion te mostraremos las peliculas de un director")
+                    criteria =input('Ingrese el criterio de búsqueda , el nombre del director\n')
                     conocerAUnDir(lista,lista1, criteria)
+
+            elif int(inputs[0])==7: #opcion 7
+                if lista==None or lista['size']==0: #obtener la longitud de la lista
+                    print("La lista esta vacía")
+                else:
+                    print("en esta opcion te mostraremos las peliculas de un actorr")
+                    criteria =input('Ingrese el criterio de búsqueda , el nombre del actor\n')
+                    conocerAUnActor(lista,lista1, criteria)
+
+            elif int(inputs[0])==8: #opcion 8
+                if lista==None or lista['size']==0: #obtener la longitud de la lista
+                    print("La lista esta vacía")
+                else:
+                    print("en esta opcion te mostraremos las peliculas de un genero")
+                    criteria =input('Ingrese el criterio de búsqueda , el genero\n')
+                    conocerGenero(lista,criteria)
                    
                 
             elif int(inputs[0])==0: #opcion 0, salir
