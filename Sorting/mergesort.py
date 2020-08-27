@@ -26,7 +26,7 @@ from ADT import list as lt
 Implementación del algoritmo mergesort.
 """
 
-def mergesort(lst, lessfunction):
+def mergesort(lst, lessfunction, column):
     size = lt.size(lst)
     if size > 1:
         mid = (size// 2 )
@@ -35,8 +35,8 @@ def mergesort(lst, lessfunction):
         rightlist = lt.subList (lst, mid+1, size - mid )
 
         #se hace el llamado recursivo con la lista izquierda y derecha
-        mergesort (leftlist, lessfunction)
-        mergesort (rightlist, lessfunction)
+        mergesort (leftlist, lessfunction, column)
+        mergesort (rightlist, lessfunction, column)
 
         #i recorre la lista izquierda, j la derecha y k la lista original
         i=j=k=1
@@ -48,7 +48,7 @@ def mergesort(lst, lessfunction):
             elemi = lt.getElement(leftlist,i)
             elemj = lt.getElement(rightlist,j)
             #compara y ordena los elementos
-            if lessfunction (elemj, elemi):   # caso estricto elemj < elemi
+            if lessfunction (elemj, elemi, column):   # caso estricto elemj < elemi
                 lt.changeInfo(lst, k, elemj)
                 j += 1
             else:                                              # caso elemi <= elemj
@@ -66,4 +66,4 @@ def mergesort(lst, lessfunction):
             lt.changeInfo(lst, k, lt.getElement(rightlist, j))
             j += 1
             k += 1
-
+    

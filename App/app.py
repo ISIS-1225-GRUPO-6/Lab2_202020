@@ -33,6 +33,7 @@ from ADT import list as lt
 from DataStructures import listiterator as it
 from DataStructures import liststructure as lt
 from Sorting import shellsort as sh
+from Sorting import mergesort as ms
 
 
 from time import process_time 
@@ -81,6 +82,7 @@ def printMenu():
     print("6- Conocer a un director")
     print("7- Conocer a un actor")
     print("8- Conocer genero")
+    print("9- ordenar genero")
     print("0- Salir")
 
 def countElementsFilteredByColumn(criteria, column, lst):
@@ -145,7 +147,7 @@ def mayor(pelicula1, pelicula2, column):
     return False
 
 def menor(pelicula1, pelicula2, column):
-    if(float(pelicula1[column])>float(pelicula2[column])):
+    if(float(pelicula1[column])<float(pelicula2[column])):
         return True
     return False
 
@@ -154,12 +156,51 @@ def order(list, maome, column):
         sh.shellSort(list , mayor, column)
         for i in range(10):
             pelicula = lt.getElement(list, i)
-            print (pelicula['title']+": "+ pelicula[column])
+            print (str(i+1)+". "+pelicula['title']+": "+ pelicula[column])
     else:
         sh.shellSort(list , menor, column)
         for i in range(10):
             pelicula = lt.getElement(list, i)
-            print (pelicula['title']+": "+ pelicula[column])
+            print (str(i+1)+". "+pelicula['title']+": "+ pelicula[column])
+
+def orderGender(list, maome, criteria, column):
+    if(maome==0):
+        ms.mergesort(list,mayor, column)
+        rep=0
+        promedio=0
+        calificacion=0.0
+        for i in range(list['size']):
+            pelicula = lt.getElement(list, i)
+            if rep>=10:
+                break
+            generos = pelicula['genres'].split("|")
+            for genero in generos:
+                if genero.strip() == criteria:
+                    rep+=1
+                    promedio= int(pelicula['vote_count'])
+                    calificacion += float(pelicula['vote_average'])
+                    print (str(rep)+". "+pelicula['title']+", tiene : "+ pelicula['vote_count']+" votos y su calificacion es: "+ pelicula['vote_average'])
+                    break
+        print("el promedio de votos es : "+ str((promedio/10))+ " y su calificacion promedio es: "+ str((calificacion/10.0)))
+            
+    else:
+        ms.mergesort(list,menor, column)
+        rep=0
+        promedio=0
+        calificacion=0.0
+        for i in range(list['size']):
+            pelicula = lt.getElement(list, i)
+            if rep>=10:
+                break
+            generos = pelicula['genres'].split("|")
+            for genero in generos:
+                if genero.strip() == criteria:
+                    rep+=1
+                    promedio= int(pelicula['vote_count'])
+                    calificacion += float(pelicula['vote_average'])
+                    print (str(rep)+". "+pelicula['title']+", tiene : "+ pelicula['vote_count']+" votos y su calificacion es: "+ pelicula['vote_average'])
+                    break
+        print("el promedio de votos es : "+ str((promedio/10))+ " y su calificacion promedio es: "+ str((calificacion/10.0)))
 
 def conocerAUnDir(lst, lst1, criteria):
     if lst['size']==0 or lst1['size']==0:
@@ -305,20 +346,35 @@ def selcol(resp):
     
     return resp1
 
-def selcol1(resp, orden):
+def selorden(resp):
+    resp1=0
+    if resp ==1:
+        resp1 = 0
+    elif resp ==2:
+        resp1 = 1
+    elif resp ==3:
+        resp1 = 0
+    elif resp ==4:
+        resp1 = 1
+    else:
+        print("no seleccionaste ninguna opcion valida")
+    
+    return resp1
+
+def selcol1(resp):
     resp1=''
     if resp ==1:
         resp1 = 'vote_count'
-        orden=0
+       
     elif resp ==2:
         resp1 = 'vote_count'
-        orden=1
+        
     elif resp ==3:
         resp1 = 'vote_average'
-        orden=0
+        
     elif resp ==4:
         resp1 = 'vote_average'
-        orden=1
+       
     else:
         print("no seleccionaste ninguna opcion valida")
     
@@ -342,7 +398,6 @@ def main():
                 lista = loadCSVFile("Data/themoviesdb/SmallMoviesDetailsCleaned.csv")
                 lista1 = loadCSVFile("Data/themoviesdb/MoviesCastingRaw-small.csv") #llamar funcion cargar datos
                 print("Datos cargados, ",lista['size']," elementos cargados")
-                print(lt.getElement(lista, 0))
             
             
             
@@ -382,8 +437,8 @@ def main():
                 else:
                     menu2()
                     resp = input("seleccione que opcion buscar \n")
-                    orden=0
-                    columna = selcol1(int(resp), orden)
+                    orden=selorden(int(resp))
+                    columna = selcol1(int(resp))
                     order(lista,orden,columna)
 
             elif int(inputs[0])==6: #opcion 6
@@ -409,6 +464,17 @@ def main():
                     print("en esta opcion te mostraremos las peliculas de un genero")
                     criteria =input('Ingrese el criterio de búsqueda , el genero\n')
                     conocerGenero(lista,criteria)
+
+            elif int(inputs[0])==9: #opcion 9
+                if lista==None or lista['size']==0: #obtener la longitud de la lista
+                    print("La lista esta vacía")
+                else:
+                    menu2()
+                    resp = input("seleccione que opcion buscar \n")
+                    criteria =input('Ingrese el criterio de búsqueda , el genero\n')
+                    orden=selorden(int(resp))
+                    columna = selcol1(int(resp))
+                    orderGender(lista, orden, criteria, columna )
                    
                 
             elif int(inputs[0])==0: #opcion 0, salir
