@@ -287,6 +287,7 @@ def conocerAUnActor(lst, lst1, criteria):
 
 def conocerGenero(lst, criteria):
     if lst['size']==0 :
+        
         print("lista vacia")
     else:
         t1_start=process_time()
