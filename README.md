@@ -1,2 +1,4 @@
-# Lab2_202010
+# entrega final
+
+Juan Pablo Hernandez Rojas 201912855
 Listas y ordenamientos

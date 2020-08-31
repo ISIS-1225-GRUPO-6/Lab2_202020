@@ -112,6 +112,7 @@ def countElementsFilteredByColumn(criteria, column, lst):
     return counter
 
 def countElementsByCriteria(criteria, column, lst, lst1):
+    "requerimiento 1"
     if lst['size']==0 or lst1['size']==0:
         print("lista vacia")
         return 0
@@ -149,6 +150,7 @@ def menor(pelicula1, pelicula2, column):
     return False
 
 def order(list, maome, column):
+    "requerimiento 2"
     if(maome==0):
         ms.mergesort(list , mayor, column)
         for i in range(10):
@@ -200,6 +202,7 @@ def orderGender(list, maome, criteria, column):
         print("el promedio de votos es : "+ str((promedio/10))+ " y su calificacion promedio es: "+ str((calificacion/10.0)))
 
 def conocerAUnDir(lst, lst1, criteria):
+    "requerimiento 3"
     if lst['size']==0 or lst1['size']==0:
         print("lista vacia")
     else:
