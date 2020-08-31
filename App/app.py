@@ -163,6 +163,7 @@ def order(list, maome, column):
             print (str(i+1)+". "+pelicula['title']+": "+ pelicula[column])
 
 def orderGender(list, maome, criteria, column):
+    "requerimiento 6"
     if(maome==0):
         ms.mergesort(list,mayor, column)
         rep=0
@@ -240,6 +241,7 @@ def existe(lst, column, criteria ):
             return False
 
 def conocerAUnActor(lst, lst1, criteria):
+    "requerimiento 4"
     if lst['size']==0 or lst1['size']==0:
         print("lista vacia")
     else:
@@ -289,6 +291,7 @@ def conocerAUnActor(lst, lst1, criteria):
     print("\nEl actor tiene "+str(cont)+" peliculas y su calificación media es "+str(prom)+ "\n el director con quien mas ha grabado es: "+ directorname)
 
 def conocerGenero(lst, criteria):
+    "requerimiento 5"
     if lst['size']==0 :
         
         print("lista vacia")
