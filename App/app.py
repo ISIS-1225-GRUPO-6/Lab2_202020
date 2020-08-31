@@ -150,12 +150,12 @@ def menor(pelicula1, pelicula2, column):
 
 def order(list, maome, column):
     if(maome==0):
-        sh.shellSort(list , mayor, column)
+        ms.mergesort(list , mayor, column)
         for i in range(10):
             pelicula = lt.getElement(list, i)
             print (str(i+1)+". "+pelicula['title']+": "+ pelicula[column])
     else:
-        sh.shellSort(list , menor, column)
+        ms.mergesort(list , menor, column)
         for i in range(10):
             pelicula = lt.getElement(list, i)
             print (str(i+1)+". "+pelicula['title']+": "+ pelicula[column])
@@ -322,7 +322,7 @@ def menu1():
 def menu2():
     print("\nBienvenido, te mostraremos las 10 peliculas: ")
     print("1- mas votadas")
-    print("2- menos botadas")
+    print("2- menos votadas")
     print("3- mejor calificadas")
     print("4- peor calificadas")
     
