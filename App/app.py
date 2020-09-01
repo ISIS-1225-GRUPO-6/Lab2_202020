@@ -280,6 +280,7 @@ def conocerAUnActor(lst, lst1, criteria):
         for i in range(director['size']):
             element = lt.getElement(director, i)
             if int(element['veces'])> mas:
+                mas=int(element['veces'])
                 directorname= element['name']
 
         t1_stop = process_time() #tiempo final
