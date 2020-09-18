@@ -171,7 +171,7 @@ def orderGender(list, maome, criteria, column):
         calificacion=0.0
         for i in range(list['size']):
             pelicula = lt.getElement(list, i)
-            if rep>=10:
+            if rep<=10:
                 break
             generos = pelicula['genres'].split("|")
             for genero in generos:
